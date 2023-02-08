@@ -1,7 +1,7 @@
 import pandas as pd
 import requests
 import os
-
+from env import get_connection
 
 
 
@@ -82,3 +82,47 @@ def combine_df(df_x, df_y, df_z):
     starwars_df = pd.concat([df_x, df_y, df_z], axis = 1)
     
     return starwars_df
+
+
+def acquire_store():
+    
+    filename = 'store.csv'
+    
+    if os.path.exists(filename):
+        
+        return pd.read_csv(filename)
+    
+    else:
+        
+        query = '''
+                SELECT sale_date, sale_amount,
+                item_brand, item_name, item_price,
+                store_address, store_zipcode
+                FROM sales
+                LEFT JOIN items USING(item_id)
+                LEFT JOIN stores USING(store_id)
+                '''
+        
+        url = get_connection(db='tsa_item_demand')
+        
+        df = pd.read_sql(query, url)
+        
+        df.to_csv(filename, index=False)
+        
+        return df
+    
+def get_renewable_energy_data():
+    
+    if os.path.isfile('renewable_energy_production.csv'):
+        
+        return pd.read_csv('renewable_energy_production.csv')
+    
+    else:
+       
+        url = 'https://raw.githubusercontent.com/jenfly/opsd/master/opsd_germany_daily.csv'
+
+        df = pd.DataFrame(pd.read_csv(url))
+        
+        df.to_csv('renewable_energy_production.csv', index = False)
+   
+    return df    
