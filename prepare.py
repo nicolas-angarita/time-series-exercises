@@ -26,6 +26,8 @@ def store_prepared():
     
     df['month'] = df.index.month_name()
     
+    df['sales_total'] = df['sale_amount'] * df['item_price']
+    
     return df
 
 
